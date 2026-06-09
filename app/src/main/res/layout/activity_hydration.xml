@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Catat Hidrasi"
+        android:textColor="#60A5FA"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Target Air Harian (ml)"
+        app:hintTextColor="#9CA3AF"
+        app:boxBackgroundColor="#1C1C1E"
+        app:boxStrokeColor="#3B82F6"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etWaterTarget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Total Air Diminum Hari Ini (ml)"
+        app:hintTextColor="#9CA3AF"
+        app:boxBackgroundColor="#1C1C1E"
+        app:boxStrokeColor="#3B82F6"
+        android:layout_marginBottom="32dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etWaterConsumed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSaveHydration"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="SIMPAN"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="#3B82F6"
+        app:cornerRadius="12dp" />
+</LinearLayout>
