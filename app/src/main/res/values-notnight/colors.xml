@@ -1,0 +1,6 @@
+<resources>
+    <color name="bg_main">#121212</color>
+    <color name="bg_card">#1C1C1E</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#9CA3AF</color>
+</resources>
