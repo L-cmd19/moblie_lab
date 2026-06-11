@@ -122,9 +122,9 @@ public class MissionActivity extends AppCompatActivity {
 
         btnComplete.setOnClickListener(v -> {
             if (!missionList.isEmpty()) {
-                // AMBIL DATA MISI DAN SIMPAN
+                // AMBIL DATA MISI DAN SIMPAN (Diperbarui dengan mengambil nilai Reward)
                 Mission completedMission = missionList.get(0);
-                saveCompletedMission(completedMission.getName());
+                saveCompletedMission(completedMission.getName(), completedMission.getReward());
 
                 Toast.makeText(MissionActivity.this, "Quest Selesai! XP Ditambahkan.", Toast.LENGTH_SHORT).show();
                 adapter.removeItem(0);
@@ -156,9 +156,9 @@ public class MissionActivity extends AppCompatActivity {
                 if (swipeDir == ItemTouchHelper.RIGHT) {
                     // AMBIL DATA MISI DAN SIMPAN JIKA SWIPE KANAN
                     Mission completedMission = missionList.get(position);
-                    saveCompletedMission(completedMission.getName());
+                    saveCompletedMission(completedMission.getName(), completedMission.getReward());
 
-                    Toast.makeText(MissionActivity.this, "Quest Selesai!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MissionActivity.this, "Quest Selesai! XP Ditambahkan.", Toast.LENGTH_SHORT).show();
                 } else if (swipeDir == ItemTouchHelper.LEFT) {
                     Toast.makeText(MissionActivity.this, "Quest Dilewati.", Toast.LENGTH_SHORT).show();
                 }
@@ -168,18 +168,31 @@ public class MissionActivity extends AppCompatActivity {
         new ItemTouchHelper(simpleItemTouchCallback).attachToRecyclerView(rvMissions);
     }
 
-    // --- FUNGSI BARU UNTUK MENYIMPAN RIWAYAT & XP ---
-    private void saveCompletedMission(String missionName) {
+    // --- FUNGSI BARU UNTUK MENYIMPAN RIWAYAT & XP SECARA DINAMIS ---
+    private void saveCompletedMission(String missionName, String rewardString) {
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
 
-        // 1. TAMBAHKAN XP (Pastikan dua baris ini tidak hilang)
-        int currentXP = prefs.getInt("userXP", 0);
-        editor.putInt("userXP", currentXP + 20); // Tambah 20 XP ke total saat ini
+        // 1. Ekstrak angka XP (Mengubah "+50 XP" menjadi angka 50)
+        int earnedXP = 0;
+        try {
+            // Ini akan menghapus semua huruf dan simbol, menyisakan angka saja
+            String numberOnly = rewardString.replaceAll("[^0-9]", "");
+            if (!numberOnly.isEmpty()) {
+                earnedXP = Integer.parseInt(numberOnly);
+            }
+        } catch (Exception e) {
+            earnedXP = 20; // XP Default jika terjadi error
+        }
 
-        // 2. Simpan Riwayat
+        // 2. Tambahkan ke Total XP
+        int currentXP = prefs.getInt("userXP", 0);
+        editor.putInt("userXP", currentXP + earnedXP);
+
+        // 3. Simpan Riwayat
         String riwayatLama = prefs.getString("missionHistory", "");
-        String riwayatBaru = "✅ " + missionName + " (+20 XP)\n" + riwayatLama;
+        // Format: "✅ Peregangan Punggung (+50 XP)"
+        String riwayatBaru = "✅ " + missionName + " (" + rewardString + ")\n" + riwayatLama;
         editor.putString("missionHistory", riwayatBaru);
 
         editor.apply(); // Kunci dan simpan semua perubahan

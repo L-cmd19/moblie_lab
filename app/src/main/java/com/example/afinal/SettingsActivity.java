@@ -11,9 +11,9 @@ import com.google.android.material.textfield.TextInputEditText;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private TextInputEditText etName, etAge, etWeight, etHeight, etCalories;
+    private TextInputEditText etName, etAge, etWeight, etHeight, etCalories, etCaloriesConsumed;
     private MaterialButton btnSave;
-    private MaterialSwitch switchTheme; // Tambahan untuk Sakelar Tema
+    private MaterialSwitch switchTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,30 +25,33 @@ public class SettingsActivity extends AppCompatActivity {
         etWeight = findViewById(R.id.etWeight);
         etHeight = findViewById(R.id.etHeight);
         etCalories = findViewById(R.id.etCalories);
-        btnSave = findViewById(R.id.btnSaveSettings);
-        switchTheme = findViewById(R.id.switchTheme); // Inisialisasi Sakelar
 
-        // Muat data lama jika sudah pernah disimpan
+        // Inisialisasi Input Baru
+        etCaloriesConsumed = findViewById(R.id.etCaloriesConsumed);
+
+        btnSave = findViewById(R.id.btnSaveSettings);
+        switchTheme = findViewById(R.id.switchTheme);
+
+        // Muat data lama
         loadExistingData();
 
-        // --- SPESIFIKASI POINT 7: LOCAL DATA (TEMA) ---
+        // Logika Sakelar Tema (Jangan dihapus agar poin spesifikasi aman)
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        boolean isDarkMode = prefs.getBoolean("isDarkMode", true); // Default Gelap
-        switchTheme.setChecked(isDarkMode);
+        boolean isDarkMode = prefs.getBoolean("isDarkMode", true);
+        if (switchTheme != null) {
+            switchTheme.setChecked(isDarkMode);
+            switchTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("isDarkMode", isChecked);
+                editor.apply();
 
-        switchTheme.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("isDarkMode", isChecked);
-            editor.apply();
-
-            // Ubah tema secara langsung saat sakelar ditekan
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            }
-        });
-        // ----------------------------------------------
+                if (isChecked) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
+            });
+        }
 
         btnSave.setOnClickListener(v -> saveData());
     }
@@ -60,6 +63,11 @@ public class SettingsActivity extends AppCompatActivity {
         etWeight.setText(String.valueOf(prefs.getFloat("userWeight", 60f)));
         etHeight.setText(String.valueOf(prefs.getFloat("userHeight", 170f)));
         etCalories.setText(String.valueOf(prefs.getInt("userCalories", 2000)));
+
+        // Memuat data kalori yang sudah dimakan
+        if (etCaloriesConsumed != null) {
+            etCaloriesConsumed.setText(String.valueOf(prefs.getInt("userCaloriesConsumed", 0)));
+        }
     }
 
     private void saveData() {
@@ -70,7 +78,13 @@ public class SettingsActivity extends AppCompatActivity {
             float height = Float.parseFloat(etHeight.getText().toString());
             int calories = Integer.parseInt(etCalories.getText().toString());
 
-            // Hitung BMI (Berat (kg) / (Tinggi (m) * Tinggi (m)))
+            // Mengambil angka kalori yang sudah dimakan dari kotak input
+            int caloriesConsumed = 0;
+            if (etCaloriesConsumed != null && etCaloriesConsumed.getText() != null && !etCaloriesConsumed.getText().toString().isEmpty()) {
+                caloriesConsumed = Integer.parseInt(etCaloriesConsumed.getText().toString());
+            }
+
+            // Hitung BMI
             float heightInMeter = height / 100;
             float bmi = weight / (heightInMeter * heightInMeter);
 
@@ -83,10 +97,11 @@ public class SettingsActivity extends AppCompatActivity {
             editor.putFloat("userHeight", height);
             editor.putFloat("userBMI", bmi);
             editor.putInt("userCalories", calories);
+            editor.putInt("userCaloriesConsumed", caloriesConsumed); // Menyimpan kalori yang dimakan
             editor.apply();
 
             Toast.makeText(this, "Data berhasil disimpan!", Toast.LENGTH_SHORT).show();
-            finish(); // Kembali ke halaman sebelumnya
+            finish();
 
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Harap isi semua kolom dengan benar!", Toast.LENGTH_SHORT).show();

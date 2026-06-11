@@ -27,7 +27,7 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
 
     // UI Elements
-    private TextView tvFitData, tvGoogleFitLabel, tvHeaderTitle, tvBMIScore, tvBMIStatus, tvCalorieDesc, tvSleepDuration, tvHydrationAmount;
+    private TextView tvFitData, tvGoogleFitLabel, tvHeaderTitle, tvBMIScore, tvBMIStatus, tvCalorieDesc, tvSleepDuration, tvHydrationAmount, tvCaloriePercentage;
     private ProgressBar progressCalories, progressHydration;
 
     @Nullable
@@ -50,14 +50,17 @@ public class HomeFragment extends Fragment {
         tvHydrationAmount = view.findViewById(R.id.tvHydrationAmount);
         progressHydration = view.findViewById(R.id.progressHydration);
 
-        // 1. Navigasi Pengaturan Profil & Misi
+        // Inisialisasi Teks Persentase Baru
+        tvCaloriePercentage = view.findViewById(R.id.tvCaloriePercentage);
+
+        // Navigasi Pengaturan Profil & Misi
         ShapeableImageView ivProfile = view.findViewById(R.id.ivProfile);
         ivProfile.setOnClickListener(v -> startActivity(new Intent(getActivity(), SettingsActivity.class)));
 
         MaterialCardView cardMissions = view.findViewById(R.id.cardMissions);
         cardMissions.setOnClickListener(v -> startActivity(new Intent(getActivity(), MissionActivity.class)));
 
-        // 2. NAVIGASI BARU: KLIK HIDRASI & TIDUR
+        // Navigasi Hidrasi & Tidur
         MaterialCardView cardHydration = view.findViewById(R.id.cardHydration);
         cardHydration.setOnClickListener(v -> startActivity(new Intent(getActivity(), HydrationActivity.class)));
 
@@ -67,13 +70,9 @@ public class HomeFragment extends Fragment {
         // Label API Motivasi
         tvFitData = view.findViewById(R.id.tvFitData);
         tvGoogleFitLabel = view.findViewById(R.id.tvGoogleFitLabel);
-
         tvGoogleFitLabel.setText("🔄 Refresh Motivasi");
 
-        // Fitur Tombol Refresh API
         tvGoogleFitLabel.setOnClickListener(v -> fetchQuoteApi());
-
-        // Panggil API saat pertama kali dibuka
         fetchQuoteApi();
     }
 
@@ -88,15 +87,20 @@ public class HomeFragment extends Fragment {
 
         String name = prefs.getString("userName", "Pengguna");
         float bmi = prefs.getFloat("userBMI", 0f);
-        int calories = prefs.getInt("userCalories", 2000);
         String sleepDuration = prefs.getString("userSleepDuration", "0h 0m");
+
+        // Data Kalori
+        int caloriesTarget = prefs.getInt("userCalories", 2000);
+        int caloriesConsumed = prefs.getInt("userCaloriesConsumed", 0);
+
+        // Data Hidrasi
         int waterTarget = prefs.getInt("userWaterTarget", 2000);
         int waterConsumed = prefs.getInt("userWaterConsumed", 0);
 
         if (tvHeaderTitle != null) tvHeaderTitle.setText("Halo, " + name + "!");
-        if (tvCalorieDesc != null) tvCalorieDesc.setText("Target harianmu adalah " + calories + " kcal.");
         if (tvSleepDuration != null) tvSleepDuration.setText(sleepDuration);
 
+        // Update BMI
         if (tvBMIScore != null && tvBMIStatus != null) {
             if (bmi > 0) {
                 tvBMIScore.setText(String.format("%.1f", bmi));
@@ -106,10 +110,36 @@ public class HomeFragment extends Fragment {
             }
         }
 
+        // Hitung dan Tampilkan Progress Kalori
+        if (tvCalorieDesc != null && progressCalories != null) {
+            int sisaKalori = caloriesTarget - caloriesConsumed;
+            if (sisaKalori < 0) sisaKalori = 0;
+
+            tvCalorieDesc.setText("Sisa " + sisaKalori + " kcal dari total target " + caloriesTarget + " kcal harian.");
+
+            // Menghitung angka persentase sesungguhnya
+            int caloriePercentage = (caloriesTarget > 0) ? (int) (((float) caloriesConsumed / caloriesTarget) * 100) : 0;
+
+            progressCalories.setProgress(Math.min(caloriePercentage, 100));
+
+            // Setel teks di tengah lingkaran
+            if (tvCaloriePercentage != null) {
+                tvCaloriePercentage.setText(caloriePercentage + "%");
+            }
+        }
+
+        // Progress Bar Hidrasi
         if (tvHydrationAmount != null && progressHydration != null) {
-            float waterInLiter = (float) waterConsumed / 1000;
+            int actualWaterConsumed = waterConsumed;
+
+            if (waterConsumed > 0 && waterConsumed <= 15) {
+                actualWaterConsumed = waterConsumed * 1000;
+            }
+
+            float waterInLiter = (float) actualWaterConsumed / 1000;
             tvHydrationAmount.setText(String.format("%.1f L", waterInLiter));
-            int waterPercentage = (waterTarget > 0) ? (int) (((float) waterConsumed / waterTarget) * 100) : 0;
+
+            int waterPercentage = (waterTarget > 0) ? (int) (((float) actualWaterConsumed / waterTarget) * 100) : 0;
             progressHydration.setProgress(Math.min(waterPercentage, 100));
         }
     }

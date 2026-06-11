@@ -20,6 +20,7 @@ public class RiwayatFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Pastikan nama XML ini sesuai dengan milikmu (activity_fragment_history.xml)
         return inflater.inflate(R.layout.activity_fragment_history, container, false);
     }
 
@@ -32,7 +33,6 @@ public class RiwayatFragment extends Fragment {
         historyContainer = view.findViewById(R.id.historyContainer);
     }
 
-    // --- FUNGSI INI WAJIB ADA AGAR XP LANGSUNG BERUBAH ---
     @Override
     public void onResume() {
         super.onResume();
@@ -40,15 +40,15 @@ public class RiwayatFragment extends Fragment {
     }
 
     private void loadHistoryData() {
-        SharedPreferences prefs = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        if (getActivity() == null) return;
 
-        // Membaca XP terbaru dari memori
+        SharedPreferences prefs = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+
         int totalXP = prefs.getInt("userXP", 0);
         String history = prefs.getString("missionHistory", "");
 
-        // Langsung perbarui teks di layar
         tvTotalXP.setText("🏆 Total XP: " + totalXP);
-        historyContainer.removeAllViews(); // Bersihkan wadah agar kartu tidak menumpuk ganda
+        historyContainer.removeAllViews();
 
         if (history.trim().isEmpty()) {
             tvEmptyState.setVisibility(View.VISIBLE);
@@ -65,10 +65,27 @@ public class RiwayatFragment extends Fragment {
                 TextView tvTaskName = itemView.findViewById(R.id.tvTaskName);
                 TextView tvPoints = itemView.findViewById(R.id.tvPoints);
 
-                String cleanName = mission.replace("✅ ", "").replace(" (+20 XP)", "");
+                // --- PEMBACA TEKS DINAMIS BARU ---
+                // Format yang tersimpan sekarang: "✅ Detox Digital (+100 XP)"
+                String cleanName = mission.replace("✅ ", ""); // Menjadi: "Detox Digital (+100 XP)"
+                String pointsText = "+20 XP"; // XP default jaga-jaga
+
+                // Pisahkan nama dan poinnya secara otomatis menggunakan tanda kurung
+                if (cleanName.contains("(") && cleanName.contains(")")) {
+                    int startIndex = cleanName.lastIndexOf("(");
+                    int endIndex = cleanName.lastIndexOf(")");
+
+                    if (startIndex < endIndex) {
+                        pointsText = cleanName.substring(startIndex + 1, endIndex); // Mengambil "+100 XP"
+                        cleanName = cleanName.substring(0, startIndex).trim(); // Mengambil "Detox Digital"
+                    }
+                } else if (cleanName.contains(" (+20 XP)")) {
+                    // Jaga-jaga jika kamu punya data lama yang masih tersimpan
+                    cleanName = cleanName.replace(" (+20 XP)", "");
+                }
 
                 tvTaskName.setText(cleanName);
-                tvPoints.setText("+20 XP");
+                tvPoints.setText(pointsText);
 
                 historyContainer.addView(itemView);
             }

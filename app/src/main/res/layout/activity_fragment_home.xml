@@ -188,6 +188,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- KOTAK MISI YANG SUDAH DIROMBAK ALA GAME -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMissions"
             android:clickable="true"
@@ -204,21 +205,39 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/cardBMI"
             app:layout_constraintTop_toBottomOf="@id/cardSleep"
-            app:strokeWidth="0dp">
+            app:strokeWidth="1dp"
+            app:strokeColor="#FB923C">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:gravity="center"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    app:tint="#FB923C"
+                    android:layout_marginBottom="8dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Misi Harian"
                     android:textColor="#FB923C"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kumpulkan XP!"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:textAlignment="center"
+                    android:layout_marginTop="4dp"/>
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -265,9 +284,10 @@
                     app:layout_constraintTop_toBottomOf="@id/tvCalorieTitle" />
 
                 <TextView
+                    android:id="@+id/tvCaloriePercentage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="0%"
                     android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -314,7 +334,7 @@
                     android:id="@+id/tvGoogleFitLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔄 Refresh Motivasi"
+                    android:text="Refresh Motivasi"
                     android:textColor="#60A5FA"
                     android:textSize="14sp"
                     android:textStyle="bold"

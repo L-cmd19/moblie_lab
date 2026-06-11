@@ -115,9 +115,25 @@
             app:hintTextColor="@color/text_secondary"
             app:boxBackgroundColor="@color/bg_card"
             app:boxStrokeColor="#3B82F6"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="16dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCalories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Total Kalori Dimakan Hari Ini (kcal)"
+            app:hintTextColor="@color/text_secondary"
+            app:boxBackgroundColor="@color/bg_card"
+            app:boxStrokeColor="#3B82F6"
+            android:layout_marginBottom="32dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCaloriesConsumed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_primary"
